@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<label for="frm">Create/update Category</label>
+	<form id="frm" th:object="${categoryCommand}" th:action="@{/categories/}"
+		method="post">
+		<input type="hidden" th:field="*{id}">
+		<textarea rows="3" th:field="*{description}"
+			placeholder="Insert a description"></textarea>
+		<div th:if="${#fields.hasAnyErrors()}">
+		<p th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</p>
+		</div>
+		<button type="submit">Save</button>
+	</form>
+</body>
+</html>

@@ -1,0 +1,6 @@
+INSERT INTO category (description) VALUES ('American') 
+INSERT INTO category (description) VALUES ('Italian')
+INSERT INTO category (description) VALUES ('Mexican')
+INSERT INTO category (description) VALUES ('Fast food')
+INSERT INTO unit_of_mesure (description) VALUES ('tablespoon')
+INSERT INTO unit_of_mesure (description) VALUES ('cup')

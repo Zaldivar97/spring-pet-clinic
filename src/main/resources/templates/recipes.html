@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Recipes</title>
+</head>
+<body>
+	<table>
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+
+		<tr th:each="recipe:${recipes}">
+			<td th:text="${recipe.id}">Default</td>
+			<td th:text="${recipe.description}">Default</td>
+		</tr>
+	</table>
+
+</body>
+</html>

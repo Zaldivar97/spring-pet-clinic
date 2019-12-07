@@ -7,14 +7,14 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ControllerService {
 
-	Servicio servicioimpl;	
+	Servicio servicio;	
 	@Autowired
 	public ControllerService(@Qualifier("servicioOtro") Servicio servicioOtro) {//inyecta la implementacion segun su nombre en camel case, p.e. servicioOtro y servicioImpl
-		this.servicioimpl=servicioOtro;
+		this.servicio=servicioOtro;
 	}
 	
 	public void doit() {
-		System.out.println(servicioimpl.hi());
+		System.out.println(servicio.hi());
 	}
 	
 }

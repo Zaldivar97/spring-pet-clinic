@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Set image</title>
+<script type="text/javascript">
+function handler(evt) {
+    if (evt.target.files) {
+      let reader = new FileReader()
+      reader.onload = function(e){
+        document.querySelector('img').src = e.target.result
+      }
+      reader.readAsDataURL(evt.target.files[0])
+    }
+  }
+</script>
+</head>
+<body>
+	<h1>Choose an image</h1>
+	<form method="post" enctype="multipart/form-data" th:action="@{'/categories/'+${category.id}+'/image'}">
+	<input type="file" name="image" id="image" onchange="handler(event)">
+	<button type="submit">Submit</button>
+	</form>
+	<img alt="Image not found" width="40%" height="25%" th:src="@{'/categories/'+${category.id}+'/retrieveImage'}">
+</body>
+</html>

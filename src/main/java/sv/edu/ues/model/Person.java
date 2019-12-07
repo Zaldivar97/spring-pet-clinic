@@ -1,6 +1,6 @@
 package sv.edu.ues.model;
 
-public class Person {
+public class Person extends BaseEntity{
 	private String name;
 	private String lastname;
 
