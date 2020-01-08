@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
 import sv.edu.ues.recipes.commands.CategoryCommand;
+import sv.edu.ues.recipes.exceptions.GlobalExceptionHandler;
+import sv.edu.ues.recipes.exceptions.NotFoundException;
 import sv.edu.ues.recipes.model.Category;
 import sv.edu.ues.recipes.services.CategoryService;
 
@@ -50,7 +52,8 @@ public class CategoryControllerTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		this.mvc = MockMvcBuilders.standaloneSetup(controller).build();
+		this.mvc = MockMvcBuilders.standaloneSetup(controller).
+				setControllerAdvice(GlobalExceptionHandler.class).build();
 	}
 
 	@After
@@ -80,6 +83,22 @@ public class CategoryControllerTest {
 
 		assertEquals(cat, captor.getValue());
 	}
+	
+	@Test
+	public void testControllerAdvice() throws Exception {
+		when(service.findById(Mockito.anyLong())).thenThrow(NumberFormatException.class);
+		mvc.perform(get("/categories/1/show"))
+		.andExpect(status().isBadRequest())
+		.andExpect(view().name("error"));
+	}
+	
+	@Test
+	public void testExceptionHandler() throws Exception{
+		when(service.findById(Mockito.anyLong())).thenThrow(NotFoundException.class);
+		mvc.perform(get("/categories/1/show"))
+		.andExpect(status().isNotFound())
+		.andExpect(view().name("error"));
+	}
 
 	@Test
 	public void testSave() throws Exception {
@@ -88,7 +107,7 @@ public class CategoryControllerTest {
 		com.setDescription("test");
 		mvc.perform(post("/categories/").contentType(MediaType.APPLICATION_FORM_URLENCODED)
 				.param("id", "1")
-				.param("description", "test")).andExpect(status().is3xxRedirection())
+				.param("description", "12345678912")).andExpect(status().is3xxRedirection())
 				.andExpect(view().name("redirect:/categories/"));
 		verify(service, times(1)).saveCategoryCommand(Mockito.any());
 	}
@@ -113,7 +132,8 @@ public class CategoryControllerTest {
 		cat.setImage(imageBytes);
 		Mockito.when(service.findById(Mockito.anyLong())).thenReturn(cat);
 
-		MockHttpServletResponse response = mvc.perform(get("/categories/1/retrieveImage")).andExpect(status().isOk())
+		MockHttpServletResponse response = mvc.perform(get("/categories/1/retrieveImage"))
+				.andExpect(status().isOk())
 				.andReturn().getResponse();
 
 		byte[] responseBytes = response.getContentAsByteArray();

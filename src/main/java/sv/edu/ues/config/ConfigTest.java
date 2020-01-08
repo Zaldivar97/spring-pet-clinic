@@ -33,7 +33,7 @@ public class ConfigTest {
 	public FakeDataSource fake() {
 		 FakeDataSource bean = new FakeDataSource();
 		 bean.name = user;
-		 bean.pass = env.getProperty("PWD");
+		 bean.pass = env.getProperty("PATH");
 		 bean.url = url;
 		 return bean;
 	}

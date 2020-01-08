@@ -51,9 +51,13 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public Category findById(Long id) {
-		Optional<Category> catOpt = this.repository.findById(id);
-		return catOpt.orElseThrow(() -> new NotFoundException("Category doesn't exist"));
+	public Category findById(Long id) throws NumberFormatException{
+	
+		if (id>0 && id instanceof Number) {
+			Optional<Category> catOpt = this.repository.findById(id);
+			return catOpt.orElseThrow(() -> new NotFoundException("Category doesn't exist"));
+		}
+		throw new NumberFormatException("Cannot convert the id value, because is not a number");
 	}
 
 	@Override

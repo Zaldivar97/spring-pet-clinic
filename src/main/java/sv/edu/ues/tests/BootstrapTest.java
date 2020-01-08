@@ -18,7 +18,7 @@ import sv.edu.ues.recipes.model.Recipe;
 import sv.edu.ues.recipes.model.UnitOfMesure;
 import sv.edu.ues.recipes.repositories.CategoryRepository;
 import sv.edu.ues.recipes.repositories.RecipeRepository;
-@Profile({"test","default"})
+@Profile({"test","default","dev"})
 @Slf4j
 @Component
 public class BootstrapTest implements ApplicationListener<ContextRefreshedEvent>{

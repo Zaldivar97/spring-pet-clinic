@@ -5,25 +5,51 @@
 <title>Categorias</title>
 <style>
 <!--
+<style type="text/css">
 * {
 	box-sizing: border-box;
 }
+body{
+}
 
-td {
+table{
+border-collapse: collapse;
+box-shadow: .1em .2em 1.2em 0.1em #000;
+}
+td,th {
 	padding: 1em;
+	
+}
+thead{
+background-color: navy;
+color: #fff;
+}
+tbody tr:hover{
+cursor: pointer;
+background-color: #000 !important;
+color: #fff;
+}
+tbody tr:nth-child(even) {
+	background-color: #ccc;
+}
+
+tbody tr:nth-child(odd) {
+		background-color: #eee;
+	
 }
 
 a {
 	text-decoration: none;
 	padding: .5em;
-	color: white;
-	background-color: blue;
+		color: inherit;
+	
+/* 	background-color: blue; */
 }
 
 a:hover {
-	background-color: white;
-	color: blue;
-	border: 1px solid blue;
+	background-color: blue; 
+	color: white;
+    border: 1px solid blue;
 }
 -->
 </style>
@@ -34,12 +60,7 @@ a:hover {
 	<div align="center">
 
 		<table>
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Description</th>
-				</tr>
-			</thead>
+			
 
 			<tr th:each="cat:${categories}">
 				<td th:text="${cat.id}">Default</td>

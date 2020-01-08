@@ -6,21 +6,28 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import lombok.extern.slf4j.Slf4j;
 import sv.edu.ues.recipes.commands.CategoryCommand;
+import sv.edu.ues.recipes.exceptions.NotFoundException;
+import sv.edu.ues.recipes.exceptions.util.ModelUtil;
 import sv.edu.ues.recipes.model.Category;
 import sv.edu.ues.recipes.services.CategoryService;
 
@@ -98,11 +105,13 @@ public class CategoryController {
 	}
 
 	@PostMapping
-	public String save(@ModelAttribute CategoryCommand cat, BindingResult result, Model model) {
+	public String save(@Valid @ModelAttribute("cat") CategoryCommand cat, BindingResult result, Model model) {
 //		if(cat.getDescription().equals("test")) {
 //			result.rejectValue("description", "test", "Can't be test");
 //			return "categories/new";
 //		}
+		if(result.hasErrors())
+			return "categories/new";
 
 		this.service.saveCategoryCommand(cat);
 		return "redirect:/categories/";
@@ -133,8 +142,26 @@ public class CategoryController {
 
 	@GetMapping("/new")
 	public String newCategory(Model model) {
-		model.addAttribute("categoryCommand", new CategoryCommand());
+		model.addAttribute("cat", new CategoryCommand());
 		return "categories/new";
 	}
+	
+	@ResponseStatus(code = HttpStatus.NOT_FOUND)
+	@ExceptionHandler(NotFoundException.class)
+	public ModelAndView handleNotFound(Exception exception) {
+		log.error("Handling not found exception");
+		return ModelUtil.getModelAndView("RESOURCE NOT FOUND", exception.getMessage());
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
