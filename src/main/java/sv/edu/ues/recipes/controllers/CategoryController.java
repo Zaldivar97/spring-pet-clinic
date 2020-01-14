@@ -29,16 +29,16 @@ import sv.edu.ues.recipes.commands.CategoryCommand;
 import sv.edu.ues.recipes.exceptions.NotFoundException;
 import sv.edu.ues.recipes.exceptions.util.ModelUtil;
 import sv.edu.ues.recipes.model.Category;
-import sv.edu.ues.recipes.services.CategoryService;
+import sv.edu.ues.recipes.services.reactive.CategoryReactiveService;
 
 @Slf4j
 @Controller
 @RequestMapping("/categories/")
 public class CategoryController {
 
-	private final CategoryService service;
+	private final CategoryReactiveService service;
 
-	public CategoryController(CategoryService service) {
+	public CategoryController(CategoryReactiveService service) {
 		super();
 		this.service = service;
 	}
@@ -62,14 +62,15 @@ public class CategoryController {
 	
 	*/
 	@GetMapping("/{id}/image")
-	public String setImage(Model model, @PathVariable("id") Long id) {
-		model.addAttribute("category", this.service.findCommandById(id));
+	public String setImage(Model model, @PathVariable("id") String id) throws Exception {
+		model.addAttribute("category", this.service.findCommandById(id).block());
 		return "categories/showImage";
 	}
 
 	@GetMapping("/{id}/retrieveImage")
-	public void retrieveImage(@PathVariable("id") Long id, HttpServletResponse response) {
-		Category category = this.service.findById(id);
+	public void retrieveImage(@PathVariable("id") String id, HttpServletResponse response) throws Exception {
+		Category category = this.service.findById(id).block();
+		if(category!=null)log.info("no es NULO");
 		byte[] image = new byte[category.getImage().length];
 
 		int byteArrayIndex = 0;
@@ -85,21 +86,21 @@ public class CategoryController {
 	}
 
 	@PostMapping("/{id}/image")
-	public String postImage(@PathVariable("id") Long id, @RequestParam("image") MultipartFile file) {
-		this.service.saveImage(id, file);
+	public String postImage(@PathVariable("id") String id, @RequestParam("image") MultipartFile file) {
+		this.service.saveImage(id, file).block();
 		return "redirect:/categories/" + id + "/show";
 	}
 
 	@GetMapping
 	public String findAll(Model model) {
-		List<Category> list = this.service.findAll();
+		List<CategoryCommand> list = this.service.findAll().collectList().block();
 		model.addAttribute("categories", list);
 		return "categories/all";
 	}
 
 	@GetMapping("/{id}/show")
-	public String findOne(Model model, @PathVariable("id") Long id) {
-		Category category = this.service.findById(id);
+	public String findOne(Model model, @PathVariable("id") String id) throws Exception {
+		Category category = this.service.findById(id).block();
 		model.addAttribute("categories", category);
 		return "categories/all";
 	}
@@ -113,13 +114,13 @@ public class CategoryController {
 		if(result.hasErrors())
 			return "categories/new";
 
-		this.service.saveCategoryCommand(cat);
+		this.service.saveCategoryCommand(cat).block();
 		return "redirect:/categories/";
 	}
 
 	@GetMapping("/{id}/update")
-	public String updateCategoryView(@PathVariable("id") Long id, Model model) {
-		CategoryCommand com = this.service.findCommandById(id);
+	public String updateCategoryView(@PathVariable("id") String id, Model model) throws Exception {
+		CategoryCommand com = this.service.findCommandById(id).block();
 		model.addAttribute("cat", com);
 		return "categories/new";
 	}
@@ -129,8 +130,8 @@ public class CategoryController {
 	// campo de categoria esta indicado
 	// con @Notnull(por ejemplo), la anotacion @Valid verificara que en efecto este
 	// campo no sea nulo
-	public String delete(@PathVariable("id") Long id) {
-		this.service.delete(id);
+	public String delete(@PathVariable("id") String id) {
+		this.service.delete(id).block();
 		return "redirect:/categories/";
 	}
 
@@ -142,6 +143,7 @@ public class CategoryController {
 
 	@GetMapping("/new")
 	public String newCategory(Model model) {
+//		this.service.findAll().forEach(item -> System.out.println(item.getId()+"-"+item.getDescription()));
 		model.addAttribute("cat", new CategoryCommand());
 		return "categories/new";
 	}

@@ -2,28 +2,19 @@ package sv.edu.ues.recipes.model;
 
 import java.math.BigDecimal;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import lombok.NoArgsConstructor;
 @NoArgsConstructor
-@Entity
 public class Ingredient {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	String id;
 	private String description;
 	private BigDecimal amount;
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@DBRef
 	private UnitOfMesure unitOfMesure;
-	@ManyToOne()
 	private Recipe recipe;
 
 	public Ingredient(String description, BigDecimal amount, UnitOfMesure unitOfMesure) {
@@ -58,14 +49,14 @@ public class Ingredient {
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

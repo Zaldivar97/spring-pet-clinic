@@ -1,23 +1,16 @@
 package sv.edu.ues.tests;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+
 import lombok.extern.slf4j.Slf4j;
 import sv.edu.ues.recipes.model.Category;
-import sv.edu.ues.recipes.model.Difficulty;
-import sv.edu.ues.recipes.model.Ingredient;
-import sv.edu.ues.recipes.model.Note;
-import sv.edu.ues.recipes.model.Recipe;
-import sv.edu.ues.recipes.model.UnitOfMesure;
 import sv.edu.ues.recipes.repositories.CategoryRepository;
 import sv.edu.ues.recipes.repositories.RecipeRepository;
+import sv.edu.ues.recipes.repositories.reactive.CategoryReactiveRepository;
 @Profile({"test","default","dev"})
 @Slf4j
 @Component
@@ -25,45 +18,35 @@ public class BootstrapTest implements ApplicationListener<ContextRefreshedEvent>
 	
 	RecipeRepository repository;
 	
+	@Autowired
+	CategoryReactiveRepository reactive;
+	
 	CategoryRepository categoryRepository;
+	
+	  private void loadCategories(){
+	        Category cat1 = new Category();
+	        cat1.setDescription("American");
+	        categoryRepository.save(cat1);
+
+	        Category cat2 = new Category();
+	        cat2.setDescription("Italian");
+	        categoryRepository.save(cat2);
+
+	        Category cat3 = new Category();
+	        cat3.setDescription("Mexican");
+	        categoryRepository.save(cat3);
+
+	        Category cat4 = new Category();
+	        cat4.setDescription("Fast Food");
+	        categoryRepository.save(cat4);
+	    }
 	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		log.info("TRIGGERED");
-		Optional<Category> cat1 = this.categoryRepository.findByDescription("Italian");
+		loadCategories();
+		log.info("COUNT: "+reactive.count().block().toString());
 
-		UnitOfMesure uom = new UnitOfMesure();
-		uom.setDescription("uom description");
-		UnitOfMesure uom2 = new UnitOfMesure();
-		uom.setDescription("uom description");
-		Ingredient ing = new Ingredient("ingrediente", new BigDecimal(10), uom);
-		Ingredient ing2 = new Ingredient("ingrediente", new BigDecimal(10), uom2);
-
-		Note note = new Note("notas");
-		Note note2 = new Note("notas");
-		Set<Category> set = Set.of(cat1.orElse(new Category()));
-		Recipe other = Recipe.builder()
-				.categories(set)
-				.cookTime(10)
-				.description("Otra una comida italiana")
-				.difficulty(Difficulty.HARD)
-				.directions("esta es una direccion")
-				.build();
-		
-		other.addIngredients(ing2);
-		other.setNote(note);
-		Recipe recipe = Recipe.builder()
-				.categories(set)
-				.cookTime(10)
-				.description("Esta es una comida italiana")
-				.difficulty(Difficulty.HARD)
-				.directions("esta es una direccion")
-				.build();
-		recipe.addIngredients(ing);
-		recipe.setNote(note2);
-		
-		repository.save(recipe);
-		repository.save(other);
 	}
 
 	/**

@@ -2,12 +2,9 @@ package sv.edu.ues.recipes.model;
 
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,18 +13,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
+@Document
 public class Category {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	private String id;
 	private String description;
-	@ManyToMany(mappedBy = "categories")
+	@DBRef
 	private Set<Recipe> recipes;
-	@Lob
 	private Byte[] image;
 	
-	public Category(Long id, String description) {
+	public Category(String id, String description) {
 		super();
 		this.id = id;
 		this.description = description;

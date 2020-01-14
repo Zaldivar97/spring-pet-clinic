@@ -3,19 +3,9 @@ package sv.edu.ues.recipes.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,31 +13,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor()
 @Builder
-@Entity
+@Document
 public class Recipe {
-	@Id()
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+
+	@Id
+	private String id;
 	private String source;
 	private String description;
 	private Integer prepTime;
 	private Integer cookTime;
-	@Lob
 	private String directions;
-	@OneToOne(cascade = CascadeType.ALL)
 	private Note note;
-	@Enumerated(value = EnumType.STRING)
 	private Difficulty difficulty;
 	@Builder.Default
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
 	private Set<Ingredient> ingredients = new HashSet<>();
-	@ManyToMany
-	@JoinTable(name = "recipe_category",
-	joinColumns = @JoinColumn(name = "recipe_id"),
-	inverseJoinColumns = @JoinColumn(name="category_id"))
+	@DBRef
 	private Set<Category> categories;
 	
-	public Recipe(Long id, String description) {
+	public Recipe(String id, String description) {
 		this.id = id;
 		this.description = description;
 	}
@@ -85,7 +68,7 @@ public class Recipe {
 	
 	public Recipe addIngredients(Ingredient ingredient) {
 		this.ingredients.add(ingredient);
-		ingredient.setRecipe(this);
+//		ingredient.setRecipe(this);
 		return this;
 	}
 	
@@ -98,13 +81,13 @@ public class Recipe {
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	/**
@@ -179,7 +162,7 @@ public class Recipe {
 	 */
 	public void setNote(Note note) {
 		this.note = note;
-		this.note.setRecipe(this);
+//		this.note.setRecipe(this);
 	}
 
 	

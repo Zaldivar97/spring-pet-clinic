@@ -5,6 +5,8 @@ import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,8 +15,9 @@ import sv.edu.ues.recipes.model.Recipe;
 @NoArgsConstructor
 @Setter
 @Getter
+@Document
 public class CategoryCommand {
-	private Long id;
+	private String id;
 	@Size(min = 10,max = 250)
 	@NotBlank
 	private String description;

@@ -14,13 +14,13 @@ public class CategoryTest {
 		this.cat=new Category();
 	}
 
-	@Test
-	public void testGetId() {
-		Long id = 4L;
-		this.cat.setId(id);
-		assertEquals(id, this.cat.getId());
-		//fail("Not yet implemented");
-	}
+//	@Test
+//	public void testGetId() {
+//		Long id = 4L;
+//		this.cat.setId(id);
+//		assertEquals(id, this.cat.getId());
+//		//fail("Not yet implemented");
+//	}
 
 	@Test
 	public void testGetDescription() {

@@ -56,16 +56,16 @@ public class RecipesControllerTest {
 		//fail("Not yet implemented");
 	}
 
-	@Test
-	public void testFindOne() throws Exception {
-		Recipe recipe = new Recipe(1L, "test");
-		when(service.findById(Mockito.any())).thenReturn(recipe);
-		mvc.perform(get("/recipes/1"))
-		.andExpect(status().isOk())
-		.andExpect(view().name("recipes"))
-		.andExpect(model().attribute("recipes", recipe));
+//	@Test
+//	public void testFindOne() throws Exception {
+//		Recipe recipe = new Recipe(1L, "test");
+//		when(service.findById(Mockito.any())).thenReturn(recipe);
+//		mvc.perform(get("/recipes/1"))
+//		.andExpect(status().isOk())
+//		.andExpect(view().name("recipes"))
+//		.andExpect(model().attribute("recipes", recipe));
 //		fail("Not yet implemented");
-	}
+//	}
 
 }
 

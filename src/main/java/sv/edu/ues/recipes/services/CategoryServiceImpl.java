@@ -34,12 +34,12 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public void delete(Long id) {
+	public void delete(String id) {
 		this.repository.deleteById(id);
 	}
 
 	@Override
-	public CategoryCommand findCommandById(Long id) {
+	public CategoryCommand findCommandById(String id) throws Exception {
 		return this.categorytoCategoryCommand.convert(this.findById(id));
 	}
 
@@ -51,13 +51,13 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public Category findById(Long id) throws NumberFormatException{
+	public Category findById(String id) throws Exception{
 	
-		if (id>0 && id instanceof Number) {
+		if (!id.isBlank()) {
 			Optional<Category> catOpt = this.repository.findById(id);
 			return catOpt.orElseThrow(() -> new NotFoundException("Category doesn't exist"));
 		}
-		throw new NumberFormatException("Cannot convert the id value, because is not a number");
+		throw new Exception("Cannot convert the id value, because is not a number");
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public void saveImage(Long id, MultipartFile file) {
+	public void saveImage(String id, MultipartFile file) {
 		Category category = this.repository.findById(id).get();
 		try {
 			Byte[] image = new Byte[file.getBytes().length];

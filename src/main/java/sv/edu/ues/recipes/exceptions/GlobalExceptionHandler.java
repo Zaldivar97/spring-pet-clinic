@@ -13,7 +13,7 @@ import sv.edu.ues.recipes.exceptions.util.ModelUtil;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(NumberFormatException.class)
+	@ExceptionHandler(Exception.class)
 	public ModelAndView handleNumberFormat(Exception exception) {
 		log.error("Handling number format exception");
 		return ModelUtil.getModelAndView("YOU MADE A BAD REQUEST, CHECKOUT THE PARAMS", exception.getMessage());

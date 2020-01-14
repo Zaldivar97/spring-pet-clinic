@@ -30,7 +30,7 @@ public class RecipesController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, path = "/{id}")
-	protected String findOne(@PathVariable("id") Long id, Model model) {
+	protected String findOne(@PathVariable("id")String id, Model model) {
 		model.addAttribute("recipes",this.service.findById(id));
 		return "recipes";
 	}

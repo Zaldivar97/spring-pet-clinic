@@ -1,19 +1,12 @@
 package sv.edu.ues.recipes.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import org.springframework.data.annotation.Id;
 
 import lombok.NoArgsConstructor;
 @NoArgsConstructor
-@Entity
 public class Note {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	@OneToOne
+	String id;
 	private Recipe recipe;
 	private String recipeNotes;
 	
@@ -24,13 +17,13 @@ public class Note {
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	/**

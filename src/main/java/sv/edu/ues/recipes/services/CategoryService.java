@@ -10,8 +10,8 @@ import sv.edu.ues.recipes.model.Category;
 public interface CategoryService {
 	List<Category> findAll();
 	CategoryCommand saveCategoryCommand(CategoryCommand command);
-	Category findById(Long id);
-	CategoryCommand findCommandById(Long id);
-	void delete(Long id);
-	void saveImage(Long id, MultipartFile file);
+	Category findById(String id) throws Exception;
+	CategoryCommand findCommandById(String id) throws Exception;
+	void delete(String id);
+	void saveImage(String id, MultipartFile file);
 }
