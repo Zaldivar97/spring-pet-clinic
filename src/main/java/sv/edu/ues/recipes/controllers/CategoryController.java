@@ -1,33 +1,23 @@
 package sv.edu.ues.recipes.controllers;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 import sv.edu.ues.recipes.commands.CategoryCommand;
 import sv.edu.ues.recipes.exceptions.NotFoundException;
-import sv.edu.ues.recipes.exceptions.util.ModelUtil;
 import sv.edu.ues.recipes.model.Category;
 import sv.edu.ues.recipes.services.reactive.CategoryReactiveService;
 
@@ -37,10 +27,16 @@ import sv.edu.ues.recipes.services.reactive.CategoryReactiveService;
 public class CategoryController {
 
 	private final CategoryReactiveService service;
-
+	private WebDataBinder dataBinder;
+	
 	public CategoryController(CategoryReactiveService service) {
 		super();
 		this.service = service;
+	}
+	
+	@InitBinder
+	public void initBinder(WebDataBinder dataBinder) {
+		this.dataBinder = dataBinder;
 	}
 
 	/*AL UTILIZAR DE ESTE MODO LOS MODEL ATTRIBUTES, ES RECOMENDABLE ANOTAR LA CLASE CON
@@ -63,65 +59,66 @@ public class CategoryController {
 	*/
 	@GetMapping("/{id}/image")
 	public String setImage(Model model, @PathVariable("id") String id) throws Exception {
-		model.addAttribute("category", this.service.findCommandById(id).block());
+		model.addAttribute("category", this.service.findCommandById(id));
 		return "categories/showImage";
 	}
 
-	@GetMapping("/{id}/retrieveImage")
-	public void retrieveImage(@PathVariable("id") String id, HttpServletResponse response) throws Exception {
-		Category category = this.service.findById(id).block();
-		if(category!=null)log.info("no es NULO");
-		byte[] image = new byte[category.getImage().length];
-
-		int byteArrayIndex = 0;
-		for (Byte bait : category.getImage()) {
-			image[byteArrayIndex++] = bait;
-		}
-		InputStream stream = new ByteArrayInputStream(image);
-		try {
-			IOUtils.copy(stream, response.getOutputStream());
-		} catch (IOException e) {
-			log.info(e.getMessage());
-		}
-	}
+//	@GetMapping("/{id}/retrieveImage")
+//	public void retrieveImage(@PathVariable("id") String id, HttpServletResponse response) throws Exception {
+//		Category category = this.service.findById(id).block();
+//		if(category!=null)log.info("no es NULO");
+//		byte[] image = new byte[category.getImage().length];
+//
+//		int byteArrayIndex = 0;
+//		for (Byte bait : category.getImage()) {
+//			image[byteArrayIndex++] = bait;
+//		}
+//		InputStream stream = new ByteArrayInputStream(image);
+//		try {
+//			IOUtils.copy(stream, response.getOutputStream());
+//		} catch (IOException e) {
+//			log.info(e.getMessage());
+//		}
+//	}
 
 	@PostMapping("/{id}/image")
 	public String postImage(@PathVariable("id") String id, @RequestParam("image") MultipartFile file) {
-		this.service.saveImage(id, file).block();
+		this.service.saveImage(id, file);
 		return "redirect:/categories/" + id + "/show";
 	}
 
 	@GetMapping
 	public String findAll(Model model) {
-		List<CategoryCommand> list = this.service.findAll().collectList().block();
-		model.addAttribute("categories", list);
+		log.info("ENTRA");
+		model.addAttribute("categories", this.service.findAll().collectList());
 		return "categories/all";
 	}
 
 	@GetMapping("/{id}/show")
 	public String findOne(Model model, @PathVariable("id") String id) throws Exception {
-		Category category = this.service.findById(id).block();
+		Mono<Category> category = this.service.findById(id);
 		model.addAttribute("categories", category);
 		return "categories/all";
 	}
 
 	@PostMapping
-	public String save(@Valid @ModelAttribute("cat") CategoryCommand cat, BindingResult result, Model model) {
+	public String save(@ModelAttribute("cat") CategoryCommand cat, Model model) {
 //		if(cat.getDescription().equals("test")) {
 //			result.rejectValue("description", "test", "Can't be test");
 //			return "categories/new";
 //		}
+		dataBinder.validate();
+		BindingResult result = dataBinder.getBindingResult();
 		if(result.hasErrors())
 			return "categories/new";
 
-		this.service.saveCategoryCommand(cat).block();
+		this.service.saveCategoryCommand(cat).subscribe();
 		return "redirect:/categories/";
 	}
 
 	@GetMapping("/{id}/update")
 	public String updateCategoryView(@PathVariable("id") String id, Model model) throws Exception {
-		CategoryCommand com = this.service.findCommandById(id).block();
-		model.addAttribute("cat", com);
+		this.service.findCommandById(id).subscribe(categorycommand -> model.addAttribute("cat", categorycommand));
 		return "categories/new";
 	}
 
@@ -131,7 +128,7 @@ public class CategoryController {
 	// con @Notnull(por ejemplo), la anotacion @Valid verificara que en efecto este
 	// campo no sea nulo
 	public String delete(@PathVariable("id") String id) {
-		this.service.delete(id).block();
+		this.service.delete(id).subscribe();
 		return "redirect:/categories/";
 	}
 
@@ -148,11 +145,12 @@ public class CategoryController {
 		return "categories/new";
 	}
 	
-	@ResponseStatus(code = HttpStatus.NOT_FOUND)
 	@ExceptionHandler(NotFoundException.class)
-	public ModelAndView handleNotFound(Exception exception) {
+	public String handleNotFound(Exception exception, Model model) {
 		log.error("Handling not found exception");
-		return ModelUtil.getModelAndView("RESOURCE NOT FOUND", exception.getMessage());
+		model.addAttribute("msg", "THE ITEM WAS NOT FOUND, CHECK YOUR CODE");
+		model.addAttribute("ex_message",exception.getMessage());
+		return "error";
 	}
 	
 

@@ -38,10 +38,10 @@ public class CategoryServiceImpl implements CategoryService {
 		this.repository.deleteById(id);
 	}
 
-	@Override
-	public CategoryCommand findCommandById(String id) throws Exception {
-		return this.categorytoCategoryCommand.convert(this.findById(id));
-	}
+//	@Override
+//	public CategoryCommand findCommandById(String id) throws Exception {
+//		return this.categorytoCategoryCommand.convert(this.findById(id));
+//	}
 
 	@Override
 	public List<Category> findAll() {
@@ -60,12 +60,12 @@ public class CategoryServiceImpl implements CategoryService {
 		throw new Exception("Cannot convert the id value, because is not a number");
 	}
 
-	@Override
-	public CategoryCommand saveCategoryCommand(CategoryCommand command) {
-		Category detachedCategory = categoryCommandToCategory.convert(command);
-		Category savedCategory = this.repository.save(detachedCategory);
-		return categorytoCategoryCommand.convert(savedCategory);
-	}
+//	@Override
+//	public CategoryCommand saveCategoryCommand(CategoryCommand command) {
+//		Category detachedCategory = categoryCommandToCategory.convert(command);
+//		Category savedCategory = this.repository.save(detachedCategory);
+//		return categorytoCategoryCommand.convert(savedCategory);
+//	}
 
 	@Override
 	public void saveImage(String id, MultipartFile file) {

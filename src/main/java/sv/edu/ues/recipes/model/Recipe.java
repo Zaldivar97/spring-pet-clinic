@@ -27,7 +27,7 @@ public class Recipe {
 	private Difficulty difficulty;
 	@Builder.Default
 	private Set<Ingredient> ingredients = new HashSet<>();
-	@DBRef
+//	@DBRef
 	private Set<Category> categories;
 	
 	public Recipe(String id, String description) {

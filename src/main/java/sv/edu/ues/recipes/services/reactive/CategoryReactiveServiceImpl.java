@@ -5,14 +5,16 @@ import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import sv.edu.ues.recipes.commands.CategoryCommand;
 import sv.edu.ues.recipes.commands.converter.CategoryCommandToCategory;
 import sv.edu.ues.recipes.commands.converter.CategorytoCategoryCommand;
+import sv.edu.ues.recipes.exceptions.NotFoundException;
 import sv.edu.ues.recipes.model.Category;
 import sv.edu.ues.recipes.repositories.reactive.CategoryReactiveRepository;
-
+@Slf4j
 @Service
 public class CategoryReactiveServiceImpl implements CategoryReactiveService {
 
@@ -31,27 +33,26 @@ public class CategoryReactiveServiceImpl implements CategoryReactiveService {
 	@Override
 	public Mono<CategoryCommand> saveCategoryCommand(CategoryCommand command) {
 
-		Category category = this.categoryRepository.save(this.catcom.convert(command)).block();
-
-		return Mono.just(this.command.convert(category));
+		return this.categoryRepository.save(this.catcom.convert(command)).map(this.command::convert);
+		
 	}
 
 	@Override
 	public Mono<Category> findById(String id) throws Exception {
-		return this.categoryRepository.findById(id);
+		return this.categoryRepository.findById(id).switchIfEmpty(Mono.error(new NotFoundException("FAIL")));
 	
 	}
 
 	@Override
 	public Mono<CategoryCommand> findCommandById(String id) throws Exception {
-		Category cat = this.categoryRepository.findById(id).block();
-		return Mono.just(this.command.convert(cat));
+		Mono<CategoryCommand> cat = this.categoryRepository.findById(id).map(this.command::convert)
+				.doOnError(ex->log.error("error", ex));
+		return cat;
 	}
 
 	@Override
 	public Mono<Void> delete(String id) {
-		this.categoryRepository.deleteById(id).block();
-		return Mono.empty();
+		return this.categoryRepository.deleteById(id);
 	}
 
 	@Override
@@ -70,15 +71,15 @@ public class CategoryReactiveServiceImpl implements CategoryReactiveService {
 				e.printStackTrace();
 				throw new RuntimeException();
 			}
-		}).publish(cat -> this.categoryRepository.save(cat.block()));
-		mono.block();
+		});
+		this.categoryRepository.save(mono.block()).block();
 		return Mono.empty();
 
 	}
 
 	@Override
-	public Flux<CategoryCommand> findAll() {
-		return this.categoryRepository.findAll().map(command::convert);
+	public Flux<Category> findAll() {
+		return this.categoryRepository.findAll();
 	}
 
 }

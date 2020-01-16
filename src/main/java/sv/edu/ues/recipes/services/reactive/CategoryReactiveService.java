@@ -9,7 +9,7 @@ import sv.edu.ues.recipes.model.Category;
 
 public interface CategoryReactiveService {
 	
-	Flux<CategoryCommand> findAll();
+	Flux<Category> findAll();
 	Mono<CategoryCommand> saveCategoryCommand(CategoryCommand command);
 	Mono<Category> findById(String id) throws Exception;
 	Mono<CategoryCommand> findCommandById(String id) throws Exception;

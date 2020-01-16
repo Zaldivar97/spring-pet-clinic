@@ -13,7 +13,7 @@ public class Ingredient {
 	String id;
 	private String description;
 	private BigDecimal amount;
-	@DBRef
+//	@DBRef
 	private UnitOfMesure unitOfMesure;
 	private Recipe recipe;
 
