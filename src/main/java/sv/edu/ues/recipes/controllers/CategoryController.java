@@ -4,7 +4,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import sv.edu.ues.recipes.commands.CategoryCommand;
-import sv.edu.ues.recipes.exceptions.NotFoundException;
 import sv.edu.ues.recipes.model.Category;
 import sv.edu.ues.recipes.services.reactive.CategoryReactiveService;
 
@@ -83,7 +81,7 @@ public class CategoryController {
 
 	@PostMapping("/{id}/image")
 	public String postImage(@PathVariable("id") String id, @RequestParam("image") MultipartFile file) {
-		this.service.saveImage(id, file);
+		this.service.saveImage(id, file).subscribe();
 		return "redirect:/categories/" + id + "/show";
 	}
 
@@ -145,13 +143,7 @@ public class CategoryController {
 		return "categories/new";
 	}
 	
-	@ExceptionHandler(NotFoundException.class)
-	public String handleNotFound(Exception exception, Model model) {
-		log.error("Handling not found exception");
-		model.addAttribute("msg", "THE ITEM WAS NOT FOUND, CHECK YOUR CODE");
-		model.addAttribute("ex_message",exception.getMessage());
-		return "error";
-	}
+	
 	
 
 	

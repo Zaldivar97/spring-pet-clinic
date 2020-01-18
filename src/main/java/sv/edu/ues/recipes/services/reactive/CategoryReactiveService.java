@@ -14,6 +14,6 @@ public interface CategoryReactiveService {
 	Mono<Category> findById(String id) throws Exception;
 	Mono<CategoryCommand> findCommandById(String id) throws Exception;
 	Mono<Void> delete(String id);
-	Mono<Void> saveImage(String id, MultipartFile file);
+	Mono<Category> saveImage(String id, MultipartFile file);
 
 }

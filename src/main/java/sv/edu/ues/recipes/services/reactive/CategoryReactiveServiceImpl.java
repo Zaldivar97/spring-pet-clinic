@@ -56,8 +56,8 @@ public class CategoryReactiveServiceImpl implements CategoryReactiveService {
 	}
 
 	@Override
-	public Mono<Void> saveImage(String id, MultipartFile file) {
-		Mono<Category> mono = this.categoryRepository.findById(id)
+	public Mono<Category> saveImage(String id, MultipartFile file) {
+		return this.categoryRepository.findById(id)
 		.map(category -> {
 			try {
 				Byte[] image = new Byte[file.getBytes().length];
@@ -71,9 +71,9 @@ public class CategoryReactiveServiceImpl implements CategoryReactiveService {
 				e.printStackTrace();
 				throw new RuntimeException();
 			}
-		});
-		this.categoryRepository.save(mono.block()).block();
-		return Mono.empty();
+		})
+		.publish(categoryMono -> this.categoryRepository.save(categoryMono.block()));
+		
 
 	}
 
